@@ -14,7 +14,7 @@ namespace TaxCalculator
             bool cont = true;
             while (cont)
             {
-                SortMenu();
+                DisplaySortMenu();
                 string answer = Console.ReadLine();
                 Console.WriteLine("\n");
                 Console.Clear();
@@ -98,7 +98,7 @@ namespace TaxCalculator
             return newEmp;
         }
 
-        static void SortMenu()
+        static void DisplaySortMenu()
         {
             Console.WriteLine("Enter a number to sort the employee data. Enter anything else to exit.\n");
             Console.WriteLine("\t\t1. By Name");
@@ -208,11 +208,11 @@ namespace TaxCalculator
             foreach (Employee employee in employees)
             {
                 Console.WriteLine($"{employee.Id,-5}{employee.Name,-12}{employee.StateCode,-12}{employee.HoursWorked,-13}" +
-                    $"{$"${employee.Rate}",-7:0.00}{$"${employee.TotalWages()}",11}{$"${employee.CalculateTax()}",13}");
+                    $"{$"${employee.Rate}",-7:0.00}{$"${employee.TotalWages()}",11}{$"${employee.CalculateTax()}",13}"); // formatted string displaying table data for employee
             }
-        }
+        } // show employee tax data table
 
-        static void DisplayEmployeeTaxBreakdown(List<Employee> employees)
+        static void DisplayEmployeeTaxBreakdown(List<Employee> employees) // select employee and show tax breakdown
         {
             Console.WriteLine("\n\n");
             Console.WriteLine("Enter an employees ID number or name to see the breakdown of their taxes. Enter anything else to go back to sorting menu.");
@@ -237,10 +237,10 @@ namespace TaxCalculator
                 }
             }
             Console.Clear();
-        }
+        } 
     }
 
-    public class TaxCalculator
+    class TaxCalculator // calculates state taxes for an employee 
     {
         private readonly Employee employee;
         private readonly State state;
@@ -251,24 +251,24 @@ namespace TaxCalculator
         {
             this.employee = employee;
             string filePath = @"./taxtable.csv";
-            List<StateTaxInfo> allStateTaxInfoList = GetStateData(filePath);
-            stateTaxInfoList = allStateTaxInfoList.FindAll(data => (data.Code == code) || (data.Name == name));
+            List<StateTaxInfo> allStateTaxInfoList = GetStateData(filePath); // read from csv file and create list of StateTaxInfo objs
+            stateTaxInfoList = allStateTaxInfoList.FindAll(data => (data.Code == code) || (data.Name == name)); // filter all objs for just ones that match given state
             string stateCode = stateTaxInfoList[0].Code;
             string stateName = stateTaxInfoList[0].Name;
-            state = new(stateCode, stateName);
+            state = new(stateCode, stateName); 
             verbose = false;
         }
 
-        public bool Verbose
+        public bool Verbose // flag property to either display breakdown of tax calculation or not
         {
             get { return verbose; }
 
             set { verbose = value; }
         }
 
-        static List<StateTaxInfo> GetStateData(string filePath)
+        static List<StateTaxInfo> GetStateData(string filePath) // read from csv file and return list of StateTaxInfo objs 
         {
-            List<StateTaxInfo> states = new();
+            List<StateTaxInfo> statesTaxList = new();
             StreamReader reader = new(File.OpenRead(filePath));
             while (!reader.EndOfStream)
             {
@@ -276,7 +276,7 @@ namespace TaxCalculator
                 try
                 {
                     StateTaxInfo newState = ValidateCreateStateTaxInfo(csv);
-                    states.Add(newState);
+                    statesTaxList.Add(newState); // if StateTaxInfo creation success, add to statesTaxList
                 }
                 catch (Exception)
                 {
@@ -284,16 +284,16 @@ namespace TaxCalculator
                     continue;
                 }
             }
-            return states;
+            return statesTaxList;
         }
 
         static StateTaxInfo ValidateCreateStateTaxInfo(string csv)
         {
             StateTaxInfo newStateTaxInfo;
-            string[] data = csv.Split(',');
+            string[] data = csv.Split(','); // produces 6 elements due to ending comma, index 5 being empty 
 
-            ArraySegment<string> attrs = new(data, 0, data.Length - 1);
-            if (attrs.Count == 5)
+            ArraySegment<string> attrs = new(data, 0, data.Length - 1); // remove element at index 5
+            if (attrs.Count == 5) // must be exactly 5 pieces of data
             {
                 string code = attrs[0];
                 string name = attrs[1];
@@ -301,7 +301,7 @@ namespace TaxCalculator
                 decimal ceiling;
                 decimal taxRate;
 
-                if (decimal.TryParse(attrs[2], out floor)
+                if (decimal.TryParse(attrs[2], out floor) // if floor, ceiling, and taxRate are decimals
                     & decimal.TryParse(attrs[3], out ceiling)
                     & decimal.TryParse(attrs[4], out taxRate))
                 {
@@ -309,7 +309,7 @@ namespace TaxCalculator
                 }
                 else
                 {
-                    throw new Exception($"Either '{attrs[2]}', '{attrs[3]}', or '{attrs[4]}' is an invalid decimal values. This StateTaxInfo for \"{name}\" not created.");
+                    throw new Exception($"Either '{attrs[2]}', '{attrs[3]}', or '{attrs[4]}' is an invalid decimal values. The StateTaxInfo for \"{name}\" not created.");
                 }
             }
             else
@@ -322,7 +322,8 @@ namespace TaxCalculator
         public decimal ComputeTaxFor(decimal amountEarned)
         {
             decimal tax = 0;
-            List<StateTaxInfo> cappedTaxBrackets = stateTaxInfoList.FindAll(data => amountEarned > data.Ceil || (data.Floor < amountEarned && amountEarned < data.Ceil));
+            List<StateTaxInfo> cappedTaxBrackets = stateTaxInfoList.FindAll(data => amountEarned > data.Ceil || (data.Floor < amountEarned && amountEarned < data.Ceil)); // filters tax brackets for this state capped at
+                                                                                  // where amount earned greater than ceiling or amountEarned within range floor-ceiling    // amountEarned
 
             int taxBracketCount = cappedTaxBrackets.Count;
             switch (taxBracketCount)
@@ -339,9 +340,9 @@ namespace TaxCalculator
 
         static decimal CalcTaxForMultiBracket(bool verbose, List<StateTaxInfo> stateTaxObjects, State state, decimal originalIncome, Employee employee)
         {
-            decimal ogIncome = originalIncome;
+            decimal ogIncome = originalIncome; // hold onto this to display at line 370
             decimal tax = 0;
-            switch (verbose)
+            switch (verbose) // lines 375-381 identical to lines 354-373 without any writing to the console
             {
                 case true:
                     Console.WriteLine("==================================================\n");
@@ -350,10 +351,11 @@ namespace TaxCalculator
                         $"sum the products of each tax rate with the portion of their" +
                         $" income within it's range.\n");
 
-                    for (int i = stateTaxObjects.Count - 1; i >= 0; i--)
+                    for (int i = stateTaxObjects.Count - 1; i >= 0; i--) // starting at highest tax bracket and iterate down
                     {
                         StateTaxInfo currTaxBracket = stateTaxObjects[i];
-                        tax += (originalIncome - currTaxBracket.Floor) * currTaxBracket.TaxRate;
+                        tax += (originalIncome - currTaxBracket.Floor) * currTaxBracket.TaxRate; // subtract the floor of this bracket from your originalIncome and multiply the difference
+                                                                                                 // by the tax rate of this bracket. Then add the product to tax 
                         Console.WriteLine($"                  Bracket {i+1}                  ");
                         Console.WriteLine("--------------------------------------------------");
                         Console.WriteLine($"{"Tax Rate(%)",-10}{currTaxBracket.TaxRate*100,19:0.00}");
@@ -364,15 +366,15 @@ namespace TaxCalculator
                         Console.WriteLine($"{"Tax", -10}{(originalIncome - currTaxBracket.Floor)*(currTaxBracket.TaxRate), 20:0.00}");
                         Console.WriteLine("--------------------------------------------------\n\n\n");
 
-                        originalIncome = currTaxBracket.Floor;
+                        originalIncome = currTaxBracket.Floor; // set originalIncome equal to the floor of the current bracket to be used as originalIncome for next tax bracket down
                     }
-                    Console.WriteLine($"\n{employee.Name} would owe ${tax:0.00} in {state.Name} state taxes on ${ogIncome:0.00}\n");
+                    Console.WriteLine($"\n{employee.Name} would owe ${tax:0.00} in {state.Name} state taxes on ${ogIncome:0.00}\n"); 
                     Console.WriteLine("==================================================\n\n\n");
                     break;
                 default:
-                    for (int i = stateTaxObjects.Count - 1; i > 0; i--)
+                    for (int i = stateTaxObjects.Count - 1; i > 0; i--) 
                     {
-                        StateTaxInfo currTaxBracket = stateTaxObjects[i];
+                        StateTaxInfo currTaxBracket = stateTaxObjects[i]; 
                         tax += (originalIncome - currTaxBracket.Floor) * currTaxBracket.TaxRate;
                         originalIncome = currTaxBracket.Floor;
                     }
@@ -408,7 +410,7 @@ namespace TaxCalculator
         }
     }
 
-    public class StateTaxInfo
+    class StateTaxInfo // object holding state tax information
     {
         private readonly string code;
         private readonly string name;
@@ -416,27 +418,13 @@ namespace TaxCalculator
         private readonly decimal ceiling;
         private readonly decimal taxRate;
 
-        public StateTaxInfo() 
-        {
-            code = "";
-            name = "";
-            floor = 0.00M;
-            ceiling = 0.00M;
-            taxRate = 0.00M;
-        }
-
-        public StateTaxInfo(string code, string name, decimal floor, decimal ceiling, decimal taxRate)
+        public StateTaxInfo(string code =  "", string name = "", decimal floor = 0.00M, decimal ceiling = 0.00M, decimal taxRate = 0.00M)
         {
             this.code = code;
             this.name = name;
             this.floor = floor;
             this.ceiling = ceiling;
             this.taxRate = taxRate;
-        }
-
-        public override string ToString()
-        {
-            return $"StateTaxInfo object--Code: {code}, Name: {name}, Floor: ${floor}, Ceil: ${ceiling}, Rate: %{taxRate}";
         }
 
         public string Code
@@ -465,18 +453,12 @@ namespace TaxCalculator
         }
     }
 
-    public class State
+    class State 
     {
         private readonly string code;
         private readonly string name;
 
-        public State()
-        {
-            code = "";
-            name = "";
-        }
-
-        public State(string code, string name)
+        public State(string code = "", string name = "")
         {
             this.code = code;
             this.name = name;
@@ -493,7 +475,7 @@ namespace TaxCalculator
         }
     }
 
-    public class Employee
+    class Employee
     {
         private readonly int id;
         private readonly string name;
@@ -535,20 +517,20 @@ namespace TaxCalculator
             get { return rate; }
         }
 
-        public decimal TotalWages()
+        public decimal TotalWages() // return total wages before tax
         {
             decimal grossIncome = hoursWorked * rate;
             return decimal.Round(grossIncome, 2);
         }
 
-        public decimal CalculateTax(bool verbose = false)
+        public decimal CalculateTax(bool verbose = false) // calc tax based on total wages and state
         {
             decimal tax = 0;
             TaxCalculator tc = new(this, code: stateCode);
             tc.Verbose = verbose;
             tax = tc.ComputeTaxFor(TotalWages());
 
-            return Decimal.Round(tax, 2);
+            return decimal.Round(tax, 2);
         }
     }
 }
