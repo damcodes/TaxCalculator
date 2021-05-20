@@ -10,6 +10,7 @@ namespace TaxCalculator
         {
             string filePath = @"./employees.csv";
             List<Employee> employees = GetCreateEmployees(filePath);
+            
             bool cont = true;
             while (cont)
             {
@@ -24,22 +25,28 @@ namespace TaxCalculator
                     case "1":
                         employees.Sort(CompareEmployeesByName);
                         DisplayEmployeDataTable(employees);
+                        DisplayEmployeeTaxBreakdown(employees);
                         break;
                     case "2":
                         employees.Sort(CompareEmployeesById);
                         DisplayEmployeDataTable(employees);
+                        DisplayEmployeeTaxBreakdown(employees);
                         break;
                     case "3":
                         employees.Sort(CompareEmployeesByState);
                         DisplayEmployeDataTable(employees);
+                        DisplayEmployeeTaxBreakdown(employees);
                         break;
                     case "4":
                         employees.Sort(CompareEmployeesBySalary);
                         DisplayEmployeDataTable(employees);
+                        DisplayEmployeeTaxBreakdown(employees);
+
                         break;
                     case "5":
                         employees.Sort(CompareEmployeesByTaxesDue);
                         DisplayEmployeDataTable(employees);
+                        DisplayEmployeeTaxBreakdown(employees);
                         break;
                     default:
                         cont = false;
@@ -205,16 +212,45 @@ namespace TaxCalculator
                     $"{$"${employee.Rate}",-7:0.00}{$"${employee.TotalWages()}",11}{$"${employee.CalculateTax()}",13}");
             }
         }
+
+        static void DisplayEmployeeTaxBreakdown(List<Employee> employees)
+        {
+            Console.WriteLine("\n\n");
+            Console.WriteLine("Enter an employees ID number or name to see the breakdown of their taxes. Enter anything else to go back to sorting menu.");
+            Console.Write("==> ");
+            string answer = Console.ReadLine();
+            int id;
+            Console.Clear();
+            for (int i = 0; i < employees.Count; i++)
+            {
+                Employee emp = employees[i];
+                if (int.TryParse(answer, out id) && id == emp.Id)
+                {
+                    emp.CalculateTax(true);
+                    Console.Write("Press enter...");
+                    Console.ReadLine();
+                }
+                else if (answer == emp.Name)
+                {
+                    emp.CalculateTax(true);
+                    Console.Write("Press enter...");
+                    Console.ReadLine();
+                }
+            }
+            Console.Clear();
+        }
     }
 
     public class TaxCalculator
     {
+        private readonly Employee employee;
         private readonly State state;
         private readonly List<StateTaxInfo> stateTaxInfoList;
         private bool verbose;
 
-        public TaxCalculator(string code = "", string name = "")
+        public TaxCalculator(Employee employee, string code = "", string name = "")
         {
+            this.employee = employee;
             string filePath = @"./taxtable.csv";
             List<StateTaxInfo> allStateTaxInfoList = GetStateData(filePath);
             stateTaxInfoList = allStateTaxInfoList.FindAll(data => (data.Code == code) || (data.Name == name));
@@ -293,16 +329,16 @@ namespace TaxCalculator
             switch (taxBracketCount)
             {
                 case > 1:
-                    tax = CalcTaxForMultiBracket(verbose: verbose, stateTaxObjects: cappedTaxBrackets, state: this.state, originalIncome: amountEarned);
+                    tax = CalcTaxForMultiBracket(verbose: verbose, stateTaxObjects: cappedTaxBrackets, state: this.state, originalIncome: amountEarned, employee: employee);
                     break;
                 default:
-                    tax = CalcTaxForOneBracket(verbose: verbose, stateTaxObjects: cappedTaxBrackets, state: this.state, originalIncome: amountEarned);
+                    tax = CalcTaxForOneBracket(verbose: verbose, stateTaxObjects: cappedTaxBrackets, state: this.state, originalIncome: amountEarned, employee: employee);
                     break;
             }
             return tax;
         }
 
-        static decimal CalcTaxForMultiBracket(bool verbose, List<StateTaxInfo> stateTaxObjects, State state, decimal originalIncome)
+        static decimal CalcTaxForMultiBracket(bool verbose, List<StateTaxInfo> stateTaxObjects, State state, decimal originalIncome, Employee employee)
         {
             decimal ogIncome = originalIncome;
             decimal tax = 0;
@@ -311,8 +347,8 @@ namespace TaxCalculator
                 case true:
                     Console.WriteLine("==================================================\n");
                     Console.WriteLine($"Computing state tax for ${originalIncome:0.00} earned in {state.Name}....\n");
-                    Console.WriteLine($"{state.Name} has {stateTaxObjects.Count} tax brackets for your income. To calculate your taxes I must cummulatively " +
-                        $"sum the products of each tax rate with the portion of your" +
+                    Console.WriteLine($"{state.Name} has {stateTaxObjects.Count} tax brackets for {employee.Name}'s income. To calculate {employee.Name}'s taxes you must cummulatively " +
+                        $"sum the products of each tax rate with the portion of their" +
                         $" income within it's range.\n");
 
                     for (int i = stateTaxObjects.Count - 1; i >= 0; i--)
@@ -331,7 +367,7 @@ namespace TaxCalculator
 
                         originalIncome = currTaxBracket.Floor;
                     }
-                    Console.WriteLine($"\nYou'd pay ${tax:0.00} in {state.Name} state taxes on ${ogIncome:0.00}\n");
+                    Console.WriteLine($"\n{employee.Name} would owe ${tax:0.00} in {state.Name} state taxes on ${ogIncome:0.00}\n");
                     Console.WriteLine("==================================================\n\n\n");
                     break;
                 default:
@@ -346,7 +382,7 @@ namespace TaxCalculator
             return tax;
         }
 
-        static decimal CalcTaxForOneBracket(bool verbose, List<StateTaxInfo> stateTaxObjects, State state, decimal originalIncome)
+        static decimal CalcTaxForOneBracket(bool verbose, List<StateTaxInfo> stateTaxObjects, State state, decimal originalIncome, Employee employee)
         {
             StateTaxInfo currTaxBracket = stateTaxObjects[0];
             decimal tax = originalIncome * stateTaxObjects[0].TaxRate;
@@ -355,9 +391,9 @@ namespace TaxCalculator
 
                 Console.WriteLine("==================================================\n");
                 Console.WriteLine($"Computing state tax for ${originalIncome:0.00} earned in {state.Name}....\n");
-                Console.WriteLine($"This state has only 1 tax bracket for your income. You claim ${originalIncome:0.00} in {state.Name}. \n" +
+                Console.WriteLine($"This state has only 1 tax bracket for {employee.Name}'s income. {employee.Name} claims ${originalIncome:0.00} in {state.Name}. \n" +
                     $"With a tax rate of {stateTaxObjects[0].TaxRate * 100:0.00}% for income between ${stateTaxObjects[0].Floor:0.00} and ${stateTaxObjects[0].Ceil:0.00}, " +
-                    $"your taxes are calculated by multiplying your income by the tax rate.\n\ntaxes = " +
+                    $"{employee.Name}'s taxes are calculated by multiplying their income by the tax rate.\n\ntaxes = " +
                     $"(income)*(tax rate) = ({originalIncome})*({stateTaxObjects[0].TaxRate}) " +
                     $"= ${originalIncome * stateTaxObjects[0].TaxRate:0.00}\n");
                 Console.WriteLine($"                   Bracket 1                     ");
@@ -366,7 +402,7 @@ namespace TaxCalculator
                 Console.WriteLine($"{"Floor(USD)",-10}{currTaxBracket.Floor,20:0.00}");
                 Console.WriteLine($"{"Ceil(USD)",-10}{currTaxBracket.Ceil,20:0.00}");
                 Console.WriteLine("--------------------------------------------------");
-                Console.WriteLine($"\nYou'd pay ${tax:0.00} in {state.Name} state taxes on ${originalIncome:0.00}\n");
+                Console.WriteLine($"\n{employee.Name} would owe ${tax:0.00} in {state.Name} state taxes on ${originalIncome:0.00}\n");
                 Console.WriteLine("==================================================\n\n\n");
             }
             return tax;
@@ -506,11 +542,11 @@ namespace TaxCalculator
             return decimal.Round(grossIncome, 2);
         }
 
-        public decimal CalculateTax()
+        public decimal CalculateTax(bool verbose = false)
         {
             decimal tax = 0;
-            TaxCalculator tc = new(code: stateCode);
-            //tc.Verbose = true;
+            TaxCalculator tc = new(this, code: stateCode);
+            tc.Verbose = verbose;
             tax = tc.ComputeTaxFor(TotalWages());
 
             return Decimal.Round(tax, 2);
