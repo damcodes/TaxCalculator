@@ -20,7 +20,7 @@
       "outputPath": "/Users/dam/Development/c-sharp/Apprenticeship/TaxCalulator/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/dam/.config/NuGet/NuGet.Config"
+        "/Users/dam/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net5.0"

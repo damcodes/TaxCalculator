@@ -10,17 +10,46 @@ namespace TaxCalculator
         {
             string filePath = @"./employees.csv";
             List<Employee> employees = GetCreateEmployees(filePath);
-            employees.Sort(CompareEmployeesByTaxesDue);
-
-            TableHeader();
-            foreach (Employee employee in employees)
+            bool cont = true;
+            while (cont)
             {
-                Console.WriteLine($"{employee.Id, -5}{employee.Name, -12}{employee.StateCode, -12}{employee.HoursWorked, -13}" +
-                    $"{$"${employee.Rate}", -7:0.00}{$"${employee.TotalWages()}", 11}{$"${employee.CalculateTax()}",13}");
+                Console.WriteLine("---------------------------------------------------------------------");
+                SortMenu();
+                string answer = Console.ReadLine();
+                Console.WriteLine("\n");
+                Console.Clear();
+                switch (answer)
+                {
+
+                    case "1":
+                        employees.Sort(CompareEmployeesByName);
+                        DisplayEmployeDataTable(employees);
+                        break;
+                    case "2":
+                        employees.Sort(CompareEmployeesById);
+                        DisplayEmployeDataTable(employees);
+                        break;
+                    case "3":
+                        employees.Sort(CompareEmployeesByState);
+                        DisplayEmployeDataTable(employees);
+                        break;
+                    case "4":
+                        employees.Sort(CompareEmployeesBySalary);
+                        DisplayEmployeDataTable(employees);
+                        break;
+                    case "5":
+                        employees.Sort(CompareEmployeesByTaxesDue);
+                        DisplayEmployeDataTable(employees);
+                        break;
+                    default:
+                        cont = false;
+                        Console.WriteLine("Goodbye.");
+                        break;
+                }
             }
         }
 
-        public static List<Employee> GetCreateEmployees(string filePath)
+        static List<Employee> GetCreateEmployees(string filePath)
         {
             List<Employee> employees = new();
             StreamReader reader = new(File.OpenRead(filePath));
@@ -42,7 +71,7 @@ namespace TaxCalculator
             return employees;
         }
 
-        public static Employee ValidateCreateEmployee(string csv)
+        static Employee ValidateCreateEmployee(string csv)
         {
             Employee newEmp;
             string[] data = csv.Split(',');
@@ -63,7 +92,18 @@ namespace TaxCalculator
             return newEmp;
         }
 
-        public static int CompareEmployeesByName(Employee a, Employee b)
+        static void SortMenu()
+        {
+            Console.WriteLine("Enter a number to sort the employee data. Enter anything else to exit.\n");
+            Console.WriteLine("\t\t1. By Name");
+            Console.WriteLine("\t\t2. By ID");
+            Console.WriteLine("\t\t3. By State");
+            Console.WriteLine("\t\t4. By Salary");
+            Console.WriteLine("\t\t5. By Taxes Due");
+            Console.Write("==> ");
+        }
+
+        static int CompareEmployeesByName(Employee a, Employee b)
         {
             if (a.Name == null)
             {
@@ -89,12 +129,12 @@ namespace TaxCalculator
             }
         }
 
-        public static int CompareEmployeesById(Employee a, Employee b)
+        static int CompareEmployeesById(Employee a, Employee b)
         {
             return b.Id.CompareTo(a.Id);
         }
 
-        public static int CompareEmployeesByState(Employee a, Employee b)
+        static int CompareEmployeesByState(Employee a, Employee b)
         {
             if (a.StateCode == null)
             {
@@ -120,7 +160,7 @@ namespace TaxCalculator
             }
         }
 
-        public static int CompareEmployeesBySalary(Employee a, Employee b)
+        static int CompareEmployeesBySalary(Employee a, Employee b)
         {
             if (b.TotalWages() > a.TotalWages())
             {
@@ -136,7 +176,7 @@ namespace TaxCalculator
             }
         }
 
-        public static int CompareEmployeesByTaxesDue(Employee a, Employee b)
+        static int CompareEmployeesByTaxesDue(Employee a, Employee b)
         {
             if (b.CalculateTax() > a.CalculateTax())
             {
@@ -150,10 +190,20 @@ namespace TaxCalculator
             { return 0; }
         }
 
-        public static void TableHeader()
+        static void TableHeader()
         {
             Console.WriteLine($"{"ID",-5}{"Employee",-12}{"State",-10}{"Hours Worked",-15}{"Rate",-8}{"Total Wages",-15}{"Taxes Due",-15}");
             Console.WriteLine("--------------------------------------------------------------------------");
+        }
+
+        static void DisplayEmployeDataTable(List<Employee> employees)
+        {
+            TableHeader();
+            foreach (Employee employee in employees)
+            {
+                Console.WriteLine($"{employee.Id,-5}{employee.Name,-12}{employee.StateCode,-12}{employee.HoursWorked,-13}" +
+                    $"{$"${employee.Rate}",-7:0.00}{$"${employee.TotalWages()}",11}{$"${employee.CalculateTax()}",13}");
+            }
         }
     }
 
