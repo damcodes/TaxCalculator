@@ -14,7 +14,6 @@ namespace TaxCalculator
             bool cont = true;
             while (cont)
             {
-                Console.WriteLine("---------------------------------------------------------------------");
                 SortMenu();
                 string answer = Console.ReadLine();
                 Console.WriteLine("\n");
@@ -22,33 +21,33 @@ namespace TaxCalculator
                 switch (answer)
                 {
 
-                    case "1":
+                    case "1": // sort by name
                         employees.Sort(CompareEmployeesByName);
                         DisplayEmployeDataTable(employees);
                         DisplayEmployeeTaxBreakdown(employees);
                         break;
-                    case "2":
+                    case "2": // sort by id
                         employees.Sort(CompareEmployeesById);
                         DisplayEmployeDataTable(employees);
                         DisplayEmployeeTaxBreakdown(employees);
                         break;
-                    case "3":
+                    case "3": // sort by state
                         employees.Sort(CompareEmployeesByState);
                         DisplayEmployeDataTable(employees);
                         DisplayEmployeeTaxBreakdown(employees);
                         break;
-                    case "4":
+                    case "4": // sort by salary
                         employees.Sort(CompareEmployeesBySalary);
                         DisplayEmployeDataTable(employees);
                         DisplayEmployeeTaxBreakdown(employees);
 
                         break;
-                    case "5":
+                    case "5": // sort by taxes due
                         employees.Sort(CompareEmployeesByTaxesDue);
                         DisplayEmployeDataTable(employees);
                         DisplayEmployeeTaxBreakdown(employees);
                         break;
-                    default:
+                    default: // exit program
                         cont = false;
                         Console.WriteLine("Goodbye.");
                         break;
@@ -221,16 +220,16 @@ namespace TaxCalculator
             string answer = Console.ReadLine();
             int id;
             Console.Clear();
-            for (int i = 0; i < employees.Count; i++)
+            for (int i = 0; i < employees.Count; i++) // iterate over employees
             {
-                Employee emp = employees[i];
-                if (int.TryParse(answer, out id) && id == emp.Id)
+                Employee emp = employees[i]; // current employee
+                if (int.TryParse(answer, out id) && id == emp.Id) // if user inputs employee id number
                 {
                     emp.CalculateTax(true);
                     Console.Write("Press enter...");
                     Console.ReadLine();
                 }
-                else if (answer == emp.Name)
+                else if (answer == emp.Name) // if user inputs employee name
                 {
                     emp.CalculateTax(true);
                     Console.Write("Press enter...");
