@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/dam/Development/c-sharp/Apprenticeship/L10/TaxCalculator.csproj",
+      "projectUniqueName": "/Users/dam/Development/c-sharp/Apprenticeship/TaxCalulator/TaxCalculator.csproj",
       "projectName": "TaxCalculator",
-      "projectPath": "/Users/dam/Development/c-sharp/Apprenticeship/L10/TaxCalculator.csproj",
+      "projectPath": "/Users/dam/Development/c-sharp/Apprenticeship/TaxCalulator/TaxCalculator.csproj",
       "packagesPath": "/Users/dam/.nuget/packages/",
-      "outputPath": "/Users/dam/Development/c-sharp/Apprenticeship/L10/obj/",
+      "outputPath": "/Users/dam/Development/c-sharp/Apprenticeship/TaxCalulator/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/dam/.config/NuGet/NuGet.Config"
