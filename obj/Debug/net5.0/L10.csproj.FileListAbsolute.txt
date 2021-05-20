@@ -1,0 +1,15 @@
+/Users/dam/Development/c-sharp/Apprenticeship/L10/bin/Debug/net5.0/L10.deps.json
+/Users/dam/Development/c-sharp/Apprenticeship/L10/bin/Debug/net5.0/L10.runtimeconfig.json
+/Users/dam/Development/c-sharp/Apprenticeship/L10/bin/Debug/net5.0/L10.runtimeconfig.dev.json
+/Users/dam/Development/c-sharp/Apprenticeship/L10/bin/Debug/net5.0/L10.dll
+/Users/dam/Development/c-sharp/Apprenticeship/L10/bin/Debug/net5.0/ref/L10.dll
+/Users/dam/Development/c-sharp/Apprenticeship/L10/bin/Debug/net5.0/L10.pdb
+/Users/dam/Development/c-sharp/Apprenticeship/L10/obj/Debug/net5.0/L10.csprojAssemblyReference.cache
+/Users/dam/Development/c-sharp/Apprenticeship/L10/obj/Debug/net5.0/L10.GeneratedMSBuildEditorConfig.editorconfig
+/Users/dam/Development/c-sharp/Apprenticeship/L10/obj/Debug/net5.0/L10.AssemblyInfoInputs.cache
+/Users/dam/Development/c-sharp/Apprenticeship/L10/obj/Debug/net5.0/L10.AssemblyInfo.cs
+/Users/dam/Development/c-sharp/Apprenticeship/L10/obj/Debug/net5.0/L10.csproj.CoreCompileInputs.cache
+/Users/dam/Development/c-sharp/Apprenticeship/L10/obj/Debug/net5.0/L10.dll
+/Users/dam/Development/c-sharp/Apprenticeship/L10/obj/Debug/net5.0/ref/L10.dll
+/Users/dam/Development/c-sharp/Apprenticeship/L10/obj/Debug/net5.0/L10.pdb
+/Users/dam/Development/c-sharp/Apprenticeship/L10/obj/Debug/net5.0/L10.genruntimeconfig.cache
